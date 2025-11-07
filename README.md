@@ -42,7 +42,7 @@
     ```bash
     cd catkin_ws/src
 
-    git clone https://github.com/RainbowRobotics/rby1_ros2_SLAM.git
+    git clone https://github.com/RainbowRobotics/rby1_ros2_SLAM.git .
 
     cd ..
 
