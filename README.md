@@ -6,7 +6,7 @@
     - SLAM
     - AMCL 기반 로봇 모바일 플랫폼 제어
 
-# 1. Pre installation
+# 1. Installing dependencies
 - ros2 humble 설치
     ```bash
     # apt update
@@ -22,10 +22,8 @@
     sudo apt update
 
     sudo apt install ros-humble-slam-toolbox
-    sudo apt install ros-humble-tf2-ros
-    sudo apt install ros-humble-tf2
     sudo apt install ros-humble-tf2-geometry-msgs
-    sudo apt install ros-humble-navigation2 ros-humble-nav2-bringup
+    sudo apt install ros-humble-nav2-bringup
     ```
 
 ## 2. Create the workspace for ROS2 Driver
@@ -74,5 +72,3 @@
     # Nav2 goal pose 넣으면 cmd_vel 나오고, 그거 input 으로 받아서 로봇 제어하는 명령어
     ros2 run lakibeam1 mobile_subscriber_test.py
     ```
-
-    +++
