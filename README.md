@@ -74,3 +74,5 @@
     # Nav2 goal pose 넣으면 cmd_vel 나오고, 그거 input 으로 받아서 로봇 제어하는 명령어
     ros2 run lakibeam1 mobile_subscriber_test.py
     ```
+
+    +++
