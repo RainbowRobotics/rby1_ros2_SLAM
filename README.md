@@ -7,6 +7,8 @@
     - AMCL 기반 로봇 모바일 플랫폼 제어
 
 # 1. Pre installation
+- [중요!] ros2 apt 저장소가 설정되어 있지 않는 경우, 아래 경로에서 별도의 사전 설정이 필요함
+    https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 - ros2 humble 설치
     ```bash
     # apt update
