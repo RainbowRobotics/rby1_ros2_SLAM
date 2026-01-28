@@ -15,7 +15,6 @@ class KeyboardTeleop(Node):
 
         self.timer = self.create_timer(0.02, self.loop)  # 50 Hz
 
-        # 현재 눌린 키
         self.pressed_keys = set()
 
         # target velocity
@@ -26,7 +25,7 @@ class KeyboardTeleop(Node):
 
         self.max_v = 0.3
         self.max_w = 0.6
-        self.alpha = 0.15  # LPF 강도 (작을수록 부드러움)
+        self.alpha = 0.15  # LPF 
 
         # terminal 설정
         self.old_term = termios.tcgetattr(sys.stdin)
@@ -56,9 +55,6 @@ class KeyboardTeleop(Node):
         if key:
             self.pressed_keys.add(key)
 
-        # 키 릴리즈 감지는 직접 안 되므로
-        # 매 루프마다 target을 재계산하는 방식 사용
-
     def compute_target(self):
         self.target = {'x': 0.0, 'y': 0.0, 'w': 0.0}
 
@@ -77,7 +73,6 @@ class KeyboardTeleop(Node):
         if 'e' in self.pressed_keys:
             self.target['w'] -= self.max_w
 
-        # 다음 루프를 위해 초기화 (눌려있는 동안 계속 들어옴)
         self.pressed_keys.clear()
 
     def lpf(self):
