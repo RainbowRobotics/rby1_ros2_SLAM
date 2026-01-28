@@ -51,7 +51,7 @@ def main(args=None):
     print(robot.set_parameter("joint_position_command.cutoff_frequency", "5"))
     print(robot.set_parameter("default.acceleration_limit_scaling", "0.8"))
 
-    # robot.power_on(".*")
+    robot.power_on(".*")
     robot.servo_on("^(right_wheel|left_wheel)$")
     # robot.servo_on("^(right_wheel|left_wheel|torso_[0-5]|right_arm[0-6]|left_arm[0-6])$")
     robot.reset_fault_control_manager()
