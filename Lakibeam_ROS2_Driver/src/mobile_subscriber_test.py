@@ -7,7 +7,10 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64MultiArray
 import time
+import argparse
 import rby1_sdk
+import rclpy
+import sys
 
 D2R = np.pi / 180
 
@@ -33,26 +36,26 @@ class SimpleSubscriber(Node):
         )
 
     def listener_callback(self, msg):
-        GlobalVariable.mobile_data = msg.linear.x, msg.angular.z
+        GlobalVariable.mobile_data = msg.linear.x, msg.linear.y, msg.angular.z
         GlobalVariable.ready = True
 
-def main(args=None):
-    rclpy.init(args=args)
+def main(address, model):
+    rclpy.init()
     subscriber = SimpleSubscriber()
-
+    
     from threading import Thread
     ros_thread = Thread(target=rclpy.spin, args=(subscriber,))
     ros_thread.start()
-
-    robot = rby1_sdk.create_robot_a("192.168.30.1:50051") # for real rby1
-    # robot = rby1_sdk.create_robot_a("localhost:50051") # for real rby1
+    
+    robot = rby1_sdk.create_robot(address, model)
     robot.connect()
 
     print(robot.set_parameter("joint_position_command.cutoff_frequency", "5"))
     print(robot.set_parameter("default.acceleration_limit_scaling", "0.8"))
 
     robot.power_on(".*")
-    robot.servo_on("^(right_wheel|left_wheel)$")
+    robot.servo_on(".*")
+    # robot.servo_on("^(right_wheel|left_wheel)$")
     # robot.servo_on("^(right_wheel|left_wheel|torso_[0-5]|right_arm[0-6]|left_arm[0-6])$")
     robot.reset_fault_control_manager()
     robot.enable_control_manager()
@@ -66,9 +69,9 @@ def main(args=None):
         q_joint_left_arm = np.zeros(7)
 
         # Set specific joint positions
-        q_joint_waist = [0, 45 * D2R, -90 * D2R, 45 * D2R, 0, 0] 
-        q_joint_right_arm = [0, -5 * D2R, 0, -120 * D2R, 0, 70 * D2R, 0]
-        q_joint_left_arm = [0, 5 * D2R, 0, -120 * D2R, 0, 70 * D2R, 0]
+        q_joint_waist = [0, 60 * D2R, -120 * D2R, 60 * D2R, 0, 0] 
+        q_joint_right_arm = [0, -5 * D2R, 0, -120 * D2R, 0, 30 * D2R, 0]
+        q_joint_left_arm = [0, 5 * D2R, 0, -120 * D2R, 0, 30 * D2R, 0]
     
         rc = rby1_sdk.RobotCommandBuilder().set_command(
             rby1_sdk.ComponentBasedCommandBuilder()
@@ -110,8 +113,8 @@ def main(args=None):
         rv = robot.send_command(rc, 10).get()
         return 0
     
-    # if not initial_joint_position_command(robot):
-    #     print("finish motion")
+    if not initial_joint_position_command(robot):
+        print("finish motion")
 
     stream = robot.create_command_stream()
 
@@ -125,7 +128,7 @@ def main(args=None):
                 .set_mobility_command(rby1_sdk.SE2VelocityCommandBuilder()
                     .set_command_header(rby1_sdk.CommandHeaderBuilder().set_control_hold_time(100))
                     .set_minimum_time(0.0202)
-                    .set_velocity(np.array([GlobalVariable.mobile_data[0], 0]), GlobalVariable.mobile_data[1])) ## 선속도, 각속도, heading angle [rad]
+                    .set_velocity(np.array([GlobalVariable.mobile_data[0], GlobalVariable.mobile_data[1]]), GlobalVariable.mobile_data[2])) ## 선속도, 각속도, heading angle [rad]
             )
             
             rv = stream.send_command(rc)
@@ -144,4 +147,13 @@ def main(args=None):
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="mobile_command")
+    parser.add_argument("--address", type=str, required=True, help="Robot address")
+    parser.add_argument(
+        "--model", type=str, default="a", help="Robot Model Name (default: 'a')"
+    )
+    args = parser.parse_args()
+    main(
+        address=args.address,
+        model=args.model
+    )
